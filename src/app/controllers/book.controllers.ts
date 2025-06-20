@@ -1,0 +1,73 @@
+import express, { Request, Response } from "express";
+import Book from "../models/book.model";
+export const bookRoutes = express.Router();
+
+// Create Book
+bookRoutes.post("/books", async (req: Request, res: Response) => {
+  const payload = req.body;
+  const book = await Book.create(payload);
+  res.status(201).json({
+    success: true,
+    message: "Book created successfully",
+    data: book,
+  });
+});
+// Get All Books
+bookRoutes.get("/books", async (req: Request, res: Response) => {
+  try {
+    const {
+      filter,
+      sortBy = "createdAt",
+      sort = "desc",
+      limit = "10",
+    } = req.query;
+    const query: any = {};
+    if (filter) {
+      query.genre = filter.toString().toUpperCase();
+    }
+    const books = await Book.find(query)
+      .sort({ [sortBy.toString()]: sort === "asc" ? 1 : -1 })
+      .limit(parseInt(limit.toString()));
+    res.status(200).json({
+      success: true,
+      message: "Books retrieved successfully",
+      data: books,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve books",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+// Get Book by ID
+bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+  const book = await Book.findById(bookId);
+  res.status(201).json({
+    success: true,
+    message: "Books retrieved successfully",
+    data: book,
+  });
+});
+// Update Book
+bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+  const book = await Book.findByIdAndUpdate(bookId);
+  res.status(201).json({
+    success: true,
+    message: "Books retrieved successfully",
+    data: book,
+  });
+});
+// Delete Book
+bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+  await Book.findByIdAndDelete(bookId);
+  res.status(201).json({
+    success: true,
+    message: "Book deleted successfully",
+    data: null,
+  });
+});
