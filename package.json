@@ -1,0 +1,36 @@
+{
+  "name": "library-management-api",
+  "version": "1.0.0",
+  "description": "RESTful API built with Express, TypeScript, and MongoDB to manage books and borrow operations. Features include schema validation, custom business logic, Mongoose middleware, aggregation pipeline, and filtering support.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devhasanmia/library-management-api.git"
+  },
+  "keywords": [
+    "library-management-api",
+    "MD.",
+    "HASAN",
+    "MIA",
+    "ERP"
+  ],
+  "author": "MD. HASAN MIA",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devhasanmia/library-management-api/issues"
+  },
+  "homepage": "https://github.com/devhasanmia/library-management-api#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0"
+  }
+}
