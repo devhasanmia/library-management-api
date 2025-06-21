@@ -24,3 +24,37 @@ Welcome to the Library Management API documentation built with **Express**, **Ty
 | `quantity`| number   | Yes      | Positive integer, number of copies borrowed   |
 | `dueDate` | Date     | Yes      | Date by which the book must be returned       |
 
+# API Endpoints
+
+1. **Create Book**  
+   `POST /api/books`
+
+2. **Get All Books (with filtering & sorting)**  
+   `GET /api/books?filter=&sortBy=&sort=&limit=`
+
+3. **Get Book by ID**  
+   `GET /api/books/:bookId`
+
+4. **Update Book**  
+   `PUT /api/books/:bookId`
+
+5. **Delete Book**  
+   `DELETE /api/books/:bookId`
+
+6. **Borrow a Book**  
+   `POST /api/borrow`
+
+7. **Borrowed Books Summary (Aggregation)**  
+   `GET /api/borrow`
+## How to Install and Run
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/devhasanmia/library-management-api.git
+cd library-management-api
+npm install or yarn
+```
+#### Start the server
+```bash
+yarn dev
