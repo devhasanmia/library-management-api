@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import Book from "../models/book.model";
 import { bookValidationSchema } from "../validators/book.validation";
+import { AppError } from "../errors/errorHandler";
 export const bookRoutes = express.Router();
 
 // Create Book
@@ -46,6 +47,9 @@ bookRoutes.get("/books", async (req: Request, res: Response, next: NextFunction)
 bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
   const book = await Book.findById(bookId);
+  if (!book) {
+    throw new AppError(404, "Book not found");
+  }
   res.status(200).json({
     success: true,
     message: "Books retrieved successfully",
@@ -56,6 +60,9 @@ bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
 bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
   const book = await Book.findByIdAndUpdate(bookId, req.body, { new: true });
+  if (!book) {
+    throw new AppError(404, "Book not found");
+  }
   res.status(200).json({
     success: true,
     message: "Book updated successfully",
@@ -65,8 +72,11 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
 // Delete Book
 bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
-  await Book.findByIdAndDelete(bookId);
-  res.status(201).json({
+  const book = await Book.findByIdAndDelete(bookId);
+  if (!book) {
+    throw new AppError(404, "Book not found");
+  }
+  res.status(204).json({
     success: true,
     message: "Book deleted successfully",
     data: null,
