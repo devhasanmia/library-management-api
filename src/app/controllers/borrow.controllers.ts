@@ -30,11 +30,7 @@ borrowRoutes.post("/", async (req, res, next) => {
     res.json({
       success: true,
       message: "Book borrowed successfully",
-      data: {
-        borrowId: borrowRecord._id,
-        remainingCopies: book.copies,
-        available: book.available
-      }
+      data: borrowRecord
     });
   } catch (error) {
     await session.abortTransaction();
@@ -46,7 +42,7 @@ borrowRoutes.post("/", async (req, res, next) => {
 
 borrowRoutes.get("/", async (req: Request, res: Response) => {
   try {
-    const summary = await Borrow.aggregate([
+    const summaryData = await Borrow.aggregate([
       {
         $group: {
           _id: "$book",
@@ -72,14 +68,16 @@ borrowRoutes.get("/", async (req: Request, res: Response) => {
             isbn: "$bookDetails.isbn",
           },
           totalQuantity: 1,
-        },
+        }
       },
     ]);
-
     res.status(200).json({
       success: true,
       message: "Borrowed books summary retrieved successfully",
-      data: summary,
+      data: summaryData.map(item => ({
+        book: item.book,
+        totalQuantity: item.totalQuantity,
+      })),
     });
   } catch (error) {
     res.status(500).json({
