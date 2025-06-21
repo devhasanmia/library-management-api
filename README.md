@@ -1,7 +1,7 @@
 # Library Management API
 Welcome to the Library Management API documentation built with **Express**, **TypeScript**, and **MongoDB (Mongoose)**.
 
-## 📖 Models & Validation
+## Models & Validation
 ### Book Model
 
 | Field       | Type    | Required | Validation / Notes                              |
