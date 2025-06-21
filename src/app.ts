@@ -15,7 +15,7 @@ app.get('/', (req: Request, res: Response) => {
     message: 'Welcome to the Library Management API Server',
     status: 'Running',
     version: '1.0.0',
-    documentation: '/api/docs'
+    documentation: 'https://github.com/devhasanmia/library-management-api'
   });
 });
 
