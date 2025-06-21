@@ -14,4 +14,5 @@ export interface IBook {
   description?: string;
   copies: number;
   available?: boolean;
+  borrowCopies(quantity: number): Promise<this>
 }

@@ -1,39 +1,50 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import Borrow from "../models/borrow.model";
+import { borrowValidationSchema } from "../validators/borrow.validation";
+import mongoose from "mongoose";
 import Book from "../models/book.model";
+import { AppError } from "../errors/errorHandler";
 export const borrowRoutes = express.Router();
 
 // Create Borrow
-borrowRoutes.post("/borrow", async (req: Request, res: Response) => {
-  const { book: bookId, quantity, dueDate } = req.body;
-  const book = await Book.findById(bookId);
-
-  if (!book) {
-    return res.status(404).json({ success: false, message: "Book not found" });
+borrowRoutes.post("/", async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const payload = await borrowValidationSchema.parseAsync(req.body);
+    const book = await Book.findById(payload.book).session(session);
+    if (!book) {
+      throw new AppError(404, 'Book not found', {
+        name: 'BookNotFound',
+        bookId: payload.book
+      });
+    }
+    await book.borrowCopies(payload.quantity);
+    const borrowRecord = new Borrow({
+      book: payload.book,
+      quantity: payload.quantity,
+      dueDate: payload.dueDate
+    });
+    await borrowRecord.save({ session });
+    await session.commitTransaction();
+    res.json({
+      success: true,
+      message: "Book borrowed successfully",
+      data: {
+        borrowId: borrowRecord._id,
+        remainingCopies: book.copies,
+        available: book.available
+      }
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
+  } finally {
+    session.endSession();
   }
-
-  if (book.copies < quantity) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Not enough copies available" });
-  }
-
-  book.copies -= quantity;
-  if (book.copies === 0) {
-    book.available = false;
-  }
-  await book.save();
-
-  const borrow = await Borrow.create({ book: bookId, quantity, dueDate });
-
-  return res.status(201).json({
-    success: true,
-    message: "Book borrowed successfully",
-    data: borrow,
-  });
 });
 
-borrowRoutes.get("/borrow", async (req: Request, res: Response) => {
+borrowRoutes.get("/", async (req: Request, res: Response) => {
   try {
     const summary = await Borrow.aggregate([
       {

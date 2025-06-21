@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { IBook } from "../interfaces/book.interface";
+import { AppError } from "../errors/errorHandler";
 const bookSchema = new Schema<IBook>(
   {
     title: {
@@ -33,13 +34,27 @@ const bookSchema = new Schema<IBook>(
   },
   { timestamps: true, versionKey: false }
 );
-
-bookSchema.methods.updateAvailability = async function () {
-  if (this.copies <= 0) {
-    this.available = false;
-    await this.save();
+bookSchema.methods.borrowCopies = async function (quantity: number): Promise<IBook> {
+  if (quantity <= 0) {
+    throw new AppError(400, 'Quantity must be positive', {
+      name: 'InvalidQuantity',
+      min: 1
+    });
   }
+  if (this.copies < quantity) {
+    throw new AppError(400, 'Not enough copies available', {
+      name: 'InsufficientCopies',
+      available: this.copies,
+      requested: quantity
+    });
+  }
+  this.copies -= quantity;
+  if (this.copies === 0) {
+    this.available = false;
+  }
+  return this.save();
 };
+
 
 const Book = model<IBook>("Book", bookSchema);
 
