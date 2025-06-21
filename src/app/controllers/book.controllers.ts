@@ -56,9 +56,9 @@ bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
 bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
   const book = await Book.findByIdAndUpdate(bookId, req.body, { new: true });
-  res.status(201).json({
+  res.status(200).json({
     success: true,
-    message: "Books retrieved successfully",
+    message: "Book updated successfully",
     data: book,
   });
 });
