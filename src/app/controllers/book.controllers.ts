@@ -46,7 +46,7 @@ bookRoutes.get("/books", async (req: Request, res: Response, next: NextFunction)
 bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
   const book = await Book.findById(bookId);
-  res.status(201).json({
+  res.status(200).json({
     success: true,
     message: "Books retrieved successfully",
     data: book,
@@ -55,7 +55,7 @@ bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
 // Update Book
 bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
-  const book = await Book.findByIdAndUpdate(bookId);
+  const book = await Book.findByIdAndUpdate(bookId, req.body, { new: true });
   res.status(201).json({
     success: true,
     message: "Books retrieved successfully",
@@ -63,7 +63,7 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
   });
 });
 // Delete Book
-bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
+bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
   const { bookId } = req.params;
   await Book.findByIdAndDelete(bookId);
   res.status(201).json({
