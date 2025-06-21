@@ -1,33 +1,7 @@
-# 📚 Library Management API
-
-**Salam to the group!**  
+# Library Management API
 Welcome to the Library Management API documentation built with **Express**, **TypeScript**, and **MongoDB (Mongoose)**.
 
----
-
-## 🎯 Objective
-
-Develop a Library Management System with:
-
-- Proper schema validation  
-- Business logic enforcement (e.g., availability control on borrow)  
-- Use of aggregation pipeline  
-- At least one Mongoose static or instance method  
-- Use of Mongoose middleware (pre, post)  
-- Filtering features  
-
----
-
-## 🔧 Core Requirements
-
-- Use **Express** and **TypeScript**  
-- Connect to **MongoDB** using **Mongoose**  
-- Follow exact API endpoints and response formats below  
-
----
-
 ## 📖 Models & Validation
-
 ### Book Model
 
 | Field       | Type    | Required | Validation / Notes                              |
@@ -50,29 +24,3 @@ Develop a Library Management System with:
 | `quantity`| number   | Yes      | Positive integer, number of copies borrowed   |
 | `dueDate` | Date     | Yes      | Date by which the book must be returned       |
 
----
-
-## 🚨 Generic Error Response Format
-
-```json
-{
-  "message": "Validation failed",
-  "success": false,
-  "error": {
-    "name": "ValidationError",
-    "errors": {
-      "copies": {
-        "message": "Copies must be a positive number",
-        "name": "ValidatorError",
-        "properties": {
-          "message": "Copies must be a positive number",
-          "type": "min",
-          "min": 0
-        },
-        "kind": "min",
-        "path": "copies",
-        "value": -5
-      }
-    }
-  }
-}

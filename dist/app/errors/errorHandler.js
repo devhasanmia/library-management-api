@@ -1,26 +1,20 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
-import { z } from 'zod';
-import { formatZodError } from '../utils/errorFormatter';
-
-export class AppError extends Error {
-    constructor(
-        public statusCode: number,
-        message: string,
-        public errorDetails?: any
-    ) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.globalErrorHandler = exports.AppError = void 0;
+const zod_1 = require("zod");
+const errorFormatter_1 = require("../utils/errorFormatter");
+class AppError extends Error {
+    constructor(statusCode, message, errorDetails) {
         super(message);
+        this.statusCode = statusCode;
+        this.errorDetails = errorDetails;
         Object.setPrototypeOf(this, AppError.prototype);
     }
 }
-
-export const globalErrorHandler: ErrorRequestHandler = (
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    if (err instanceof z.ZodError) {
-        const formattedError = formatZodError(err);
+exports.AppError = AppError;
+const globalErrorHandler = (err, req, res, next) => {
+    if (err instanceof zod_1.z.ZodError) {
+        const formattedError = (0, errorFormatter_1.formatZodError)(err);
         res.status(400).json({
             message: "Validation failed",
             success: false,
@@ -28,11 +22,15 @@ export const globalErrorHandler: ErrorRequestHandler = (
         });
         return;
     }
-    if (err?.code === 11000) {
+    if (typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        err.code === 11000) {
+        const keyValue = err.keyValue || {};
         res.status(409).json({
             success: false,
             message: "Duplicate entry. This data already exists.",
-            keyValue: err.keyValue || {},
+            keyValue
         });
         return;
     }
@@ -55,3 +53,4 @@ export const globalErrorHandler: ErrorRequestHandler = (
         }
     });
 };
+exports.globalErrorHandler = globalErrorHandler;
