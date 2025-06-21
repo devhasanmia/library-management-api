@@ -8,11 +8,9 @@ export const borrowRoutes = express.Router();
 
 // Create Borrow
 borrowRoutes.post("/", async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
     const payload = await borrowValidationSchema.parseAsync(req.body);
-    const book = await Book.findById(payload.book).session(session);
+    const book = await Book.findById(payload.book);
     if (!book) {
       throw new AppError(404, 'Book not found', {
         name: 'BookNotFound',
@@ -25,20 +23,17 @@ borrowRoutes.post("/", async (req, res, next) => {
       quantity: payload.quantity,
       dueDate: payload.dueDate
     });
-    await borrowRecord.save({ session });
-    await session.commitTransaction();
+    await borrowRecord.save();
     res.json({
       success: true,
       message: "Book borrowed successfully",
       data: borrowRecord
     });
   } catch (error) {
-    await session.abortTransaction();
     next(error);
-  } finally {
-    session.endSession();
   }
 });
+
 
 borrowRoutes.get("/", async (req: Request, res: Response) => {
   try {

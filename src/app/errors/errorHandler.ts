@@ -12,6 +12,7 @@ export class AppError extends Error {
         Object.setPrototypeOf(this, AppError.prototype);
     }
 }
+
 export const globalErrorHandler: ErrorRequestHandler = (
     err: unknown,
     req: Request,
@@ -27,6 +28,21 @@ export const globalErrorHandler: ErrorRequestHandler = (
         });
         return;
     }
+    if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        (err as any).code === 11000
+    ) {
+        const keyValue = (err as any).keyValue || {};
+        res.status(409).json({
+            success: false,
+            message: "Duplicate entry. This data already exists.",
+            keyValue
+        });
+        return;
+    }
+
     if (err instanceof AppError) {
         res.status(err.statusCode).json({
             success: false,
@@ -39,12 +55,10 @@ export const globalErrorHandler: ErrorRequestHandler = (
     res.status(500).json({
         success: false,
         message: "Internal server error",
-        error: process.env.NODE_ENV === 'development'
-            ? {
-                name: "InternalServerError",
-                message: errorMessage,
-                stack: err instanceof Error ? err.stack : undefined
-            }
-            : undefined
+        error: {
+            name: "Internal ServerError",
+            message: errorMessage,
+            stack: err instanceof Error ? err.stack : undefined
+        }
     });
 };

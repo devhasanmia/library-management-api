@@ -1,19 +1,24 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import Book from "../models/book.model";
+import { bookValidationSchema } from "../validators/book.validation";
 export const bookRoutes = express.Router();
 
 // Create Book
-bookRoutes.post("/books", async (req: Request, res: Response) => {
-  const payload = req.body;
-  const book = await Book.create(payload);
-  res.status(201).json({
-    success: true,
-    message: "Book created successfully",
-    data: book,
-  });
+bookRoutes.post("/books", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload = await bookValidationSchema.parseAsync(req.body);
+    const book = await Book.create(payload);
+    res.status(201).json({
+      success: true,
+      message: "Book created successfully",
+      data: book,
+    });
+  } catch (error) {
+    next(error)
+  }
 });
 // Get All Books
-bookRoutes.get("/books", async (req: Request, res: Response) => {
+bookRoutes.get("/books", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {
       filter,
@@ -33,12 +38,8 @@ bookRoutes.get("/books", async (req: Request, res: Response) => {
       message: "Books retrieved successfully",
       data: books,
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve books",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+  } catch (error: any) {
+    next(error)
   }
 });
 // Get Book by ID
